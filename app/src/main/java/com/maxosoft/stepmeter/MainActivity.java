@@ -7,6 +7,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.net.Uri;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -16,13 +17,23 @@ import com.maxosoft.stepmeter.collect.CollectService;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
+import android.os.StrictMode;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
+    private final static String EMAIL_TO = "go1oborodko97@gmail.com";
+    private final static String SUBJECT = "Collected Data";
 
     private SensorManager sensorManager;
     private Sensor accelerometer;
@@ -49,6 +60,16 @@ public class MainActivity extends AppCompatActivity {
                     collectBtn.setText("Collect");
                     stopCollecting();
                 }
+            }
+        });
+
+        final Button shareBtn = findViewById(R.id.buttonShare);
+        shareBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                File[] files = getFilesDir().listFiles();
+                sendEmail(files);
+                deleteFiles(files);
             }
         });
 
@@ -86,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void startCollecting() {
         Intent intent = new Intent(MainActivity.this, CollectService.class);
+        intent.putExtra("filesDir", getFilesDir().getAbsolutePath());
         startService(intent);
     }
 
@@ -93,6 +115,50 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(MainActivity.this, CollectService.class);
         intent.putExtra("stop", true);
         startService(intent);
+    }
+
+    private void sendEmail(File[] files) {
+        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());
+
+        System.out.println("Send email");
+
+        Intent email = new Intent(Intent.ACTION_SEND_MULTIPLE);
+        email.putExtra(Intent.EXTRA_EMAIL, new String[]{EMAIL_TO});
+        email.putExtra(Intent.EXTRA_SUBJECT, SUBJECT);
+        email.putExtra(Intent.EXTRA_TEXT, "");
+        ArrayList<Uri> uris = new ArrayList<>();
+        for (File file: files) {
+            try {
+                String name = file.getName().lastIndexOf(".") > 0 ? file.getName()
+                        .substring(0, file.getName().lastIndexOf(".")) : file.getName();
+                File tempFile = File.createTempFile(name + "_", ".txt", getExternalCacheDir());
+                FileWriter fw = new FileWriter(tempFile);
+
+                FileReader fr = new FileReader(file);
+                int c = fr.read();
+                while (c != -1) {
+                    fw.write(c);
+                    c = fr.read();
+                }
+                fr.close();
+
+                fw.flush();
+                fw.close();
+                uris.add(Uri.fromFile(tempFile));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        email.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
+        email.setType("message/rfc822");
+        startActivity(Intent.createChooser(email, "Choose an Email client :"));
+    }
+
+    private void deleteFiles(File[] files) {
+        for (File file: files) {
+            file.delete();
+        }
     }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {

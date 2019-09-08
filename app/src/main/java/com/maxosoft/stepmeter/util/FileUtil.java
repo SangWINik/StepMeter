@@ -2,16 +2,18 @@ package com.maxosoft.stepmeter.util;
 
 import android.content.Context;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
 
 public class FileUtil {
 
-    public static FileOutputStream openFileOutputStream() {
+    public static FileOutputStream openFileOutputStream(String filesDir) {
         FileOutputStream outputStream = null;
         try {
-            outputStream = new FileOutputStream(generateFileName());
+            File file = new File(filesDir + "/" + generateFileName());
+            outputStream = new FileOutputStream(file);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -36,6 +38,6 @@ public class FileUtil {
     }
 
     private static String generateFileName() {
-        return new Date().getTime() + ".txt";
+        return new Date() + ".txt";
     }
 }
