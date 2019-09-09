@@ -25,6 +25,11 @@
             android:id="@+id/buttonShare"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Share" />
+            android:text="Надіслати" />
+        <Button
+            android:id="@+id/buttonRead"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Read" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
