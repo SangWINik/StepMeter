@@ -14,7 +14,7 @@ public class RawDataEntry {
     public RawDataEntry() {}
 
     public RawDataEntry(String inputLine) {
-        String[] tokens = inputLine.split(" ");
+        String[] tokens = inputLine.replaceAll(",", ".").split(" ");
         if (tokens.length == 5) {
             this.sensorType = tokens[0].equals("a") ? Sensor.TYPE_ACCELEROMETER : Sensor.TYPE_GYROSCOPE;
             this.date = new Date(Long.valueOf(tokens[1]));

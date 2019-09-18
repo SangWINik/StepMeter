@@ -4,26 +4,18 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Bundle;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.maxosoft.stepmeter.collect.CollectService;
-import com.maxosoft.stepmeter.data.RawDataCollection;
 import com.maxosoft.stepmeter.data.Window;
 import com.maxosoft.stepmeter.util.FileUtil;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 
 import android.os.StrictMode;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
@@ -32,7 +24,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,50 +46,38 @@ public class MainActivity extends AppCompatActivity {
         if (this.isMyServiceRunning(CollectService.class)) {
             collectBtn.setText("Stop");
         }
-        collectBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (collectBtn.getText().equals("Collect")) {
-                    collectBtn.setText("Stop");
-                    startCollecting();
-                } else {
-                    collectBtn.setText("Collect");
-                    stopCollecting();
-                }
+        collectBtn.setOnClickListener(view -> {
+            if (collectBtn.getText().equals("Collect")) {
+                collectBtn.setText("Stop");
+                startCollecting();
+            } else {
+                collectBtn.setText("Collect");
+                stopCollecting();
             }
         });
 
         final Button shareBtn = findViewById(R.id.buttonShare);
-        shareBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                File dir = new File(getFilesDir().getAbsolutePath() + "/collect");
-                File[] files = dir.listFiles();
-                sendEmail(files);
-                deleteFiles(files);
-            }
+        shareBtn.setOnClickListener(view -> {
+            File dir = new File(getFilesDir().getAbsolutePath() + "/collect");
+            File[] files = dir.listFiles();
+            sendEmail(files);
+            deleteFiles(files);
         });
 
         final Button readBtn = findViewById(R.id.buttonRead);
-        readBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                File[] myFiles = FileUtil.getFilesFromDirectory(getFilesDir().getAbsolutePath() + "/data/Me");
-                File[] otherFiles = FileUtil.getFilesFromDirectory(getFilesDir().getAbsolutePath() + "/data/Others");
-                List<RawDataCollection> myData = new ArrayList<>();
-                RawDataCollection collection = new RawDataCollection(FileUtil.getRawDataFromFile(myFiles[0]));
-                List<Window> windows = collection.getWindows();
+        readBtn.setOnClickListener(view -> {
+            File[] myFiles = FileUtil.getFilesFromDirectory(getFilesDir().getAbsolutePath() + "/data/Me");
+            File[] otherFiles = FileUtil.getFilesFromDirectory(getFilesDir().getAbsolutePath() + "/data/Others");
+            List<Window> allWindows = new ArrayList<>();
+            for (File file: myFiles) {
+                allWindows.addAll(FileUtil.getWindowsFromFile(file, true));
             }
-        });
+            for (File file: otherFiles) {
+                allWindows.addAll(FileUtil.getWindowsFromFile(file, false));
+            }
 
-        /*FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });*/
+            FileUtil.createCSVFile(getFilesDir().getAbsolutePath(), allWindows);
+        });
     }
 
     @Override
