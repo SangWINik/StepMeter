@@ -107,7 +107,7 @@ public class FileUtil {
         return entries;
     }
 
-    public static void createCSVFile(String filesDir, List<Window> dataWindows) {
+    public static File createCSVFile(String filesDir, List<Window> dataWindows) {
         FileOutputStream outputStream = null;
         try {
             new File(filesDir + "/data/All").mkdirs();
@@ -118,9 +118,11 @@ public class FileUtil {
                 outputStream.write(window.getFeaturesLine().getBytes());
             }
             outputStream.close();
+            return file;
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return null;
     }
 
     private static String generateFileName() {

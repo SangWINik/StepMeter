@@ -26,6 +26,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+
+import weka.classifiers.Evaluation;
+import weka.classifiers.bayes.NaiveBayes;
+import weka.core.Instances;
+import weka.core.converters.ConverterUtils;
+
+import static weka.core.converters.ConverterUtils.*;
 
 public class MainActivity extends AppCompatActivity {
     private final static String EMAIL_TO = "go1oborodko97@gmail.com";
@@ -76,7 +84,23 @@ public class MainActivity extends AppCompatActivity {
                 allWindows.addAll(FileUtil.getWindowsFromFile(file, false));
             }
 
-            FileUtil.createCSVFile(getFilesDir().getAbsolutePath(), allWindows);
+            File dataFile = FileUtil.createCSVFile(getFilesDir().getAbsolutePath(), allWindows);
+
+            try {
+                if (dataFile != null) {
+                    DataSource source = new DataSource(dataFile.getAbsolutePath());
+                    Instances data = source.getDataSet();
+                    data.setClassIndex(data.numAttributes() - 1);
+                    NaiveBayes bayes = new NaiveBayes();
+                    bayes.buildClassifier(data);
+                    Evaluation evaluation = new Evaluation(data);
+                    evaluation.crossValidateModel(bayes, data, 10, new Random(1));
+                    System.out.println(evaluation.toSummaryString());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
         });
     }
 

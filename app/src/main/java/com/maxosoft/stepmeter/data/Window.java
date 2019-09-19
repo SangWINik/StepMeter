@@ -53,7 +53,7 @@ public class Window {
     }
 
     public static String getFeatureHeader() {
-        return "minX,maxX,minY,maxY,minZ,maxZ\n";
+        return "minX,maxX,minY,maxY,minZ,maxZ,res\n";
     }
 
     public String getFeaturesLine() {
