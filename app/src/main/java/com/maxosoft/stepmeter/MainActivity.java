@@ -9,6 +9,8 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import com.maxosoft.stepmeter.collect.CollectService;
+import com.maxosoft.stepmeter.data.ClassificationHelper;
+import com.maxosoft.stepmeter.data.FeatureSuit;
 import com.maxosoft.stepmeter.data.Window;
 import com.maxosoft.stepmeter.util.FileUtil;
 
@@ -28,8 +30,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
+import weka.classifiers.pmml.consumer.NeuralNetwork;
+import weka.classifiers.trees.J48;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils;
 
@@ -76,31 +81,15 @@ public class MainActivity extends AppCompatActivity {
         readBtn.setOnClickListener(view -> {
             File[] myFiles = FileUtil.getFilesFromDirectory(getFilesDir().getAbsolutePath() + "/data/Me");
             File[] otherFiles = FileUtil.getFilesFromDirectory(getFilesDir().getAbsolutePath() + "/data/Others");
-            List<Window> allWindows = new ArrayList<>();
-            for (File file: myFiles) {
-                allWindows.addAll(FileUtil.getWindowsFromFile(file, true));
-            }
-            for (File file: otherFiles) {
-                allWindows.addAll(FileUtil.getWindowsFromFile(file, false));
-            }
-
-            File dataFile = FileUtil.createCSVFile(getFilesDir().getAbsolutePath(), allWindows);
-
-            try {
-                if (dataFile != null) {
-                    DataSource source = new DataSource(dataFile.getAbsolutePath());
-                    Instances data = source.getDataSet();
-                    data.setClassIndex(data.numAttributes() - 1);
-                    NaiveBayes bayes = new NaiveBayes();
-                    bayes.buildClassifier(data);
-                    Evaluation evaluation = new Evaluation(data);
-                    evaluation.crossValidateModel(bayes, data, 10, new Random(1));
-                    System.out.println(evaluation.toSummaryString());
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
+            Thread classificationThread = new Thread(() -> {
+                this.runClassification(myFiles, otherFiles, new NaiveBayes(), FeatureSuit.MIN_MAX_ACC);
+                this.runClassification(myFiles, otherFiles, new J48(), FeatureSuit.MIN_MAX_ACC);
+                this.runClassification(myFiles, otherFiles, new NaiveBayes(), FeatureSuit.GENERAL_CHARACTERISTICS_ACC);
+                this.runClassification(myFiles, otherFiles, new J48(), FeatureSuit.GENERAL_CHARACTERISTICS_ACC);
+                this.runClassification(myFiles, otherFiles, new NaiveBayes(), FeatureSuit.ZERO_MEAN);
+                this.runClassification(myFiles, otherFiles, new J48(), FeatureSuit.ZERO_MEAN);
+            });
+            classificationThread.start();
         });
     }
 
@@ -190,5 +179,20 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return false;
+    }
+
+    private void runClassification(File[] ownerFiles, File[] otherFiles, Classifier classifier, FeatureSuit featureSuit) {
+        List<Window> allWindows = ClassificationHelper.getAllWindows(ownerFiles, otherFiles, featureSuit);
+        File dataFile = FileUtil.createCSVFile(getFilesDir().getAbsolutePath(), allWindows);
+
+        try {
+            Instances data = ClassificationHelper.getSourceData(dataFile);
+            Evaluation evaluation = ClassificationHelper.getClassificationResults(classifier, data);
+            System.out.println(classifier.getClass().toString() + "evaluation");
+            System.out.println("Feature Suit: " + featureSuit.name());
+            System.out.println(evaluation.toSummaryString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

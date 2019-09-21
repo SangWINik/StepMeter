@@ -30,6 +30,6 @@
             android:id="@+id/buttonRead"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Read" />
+            android:text="Classify" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -16,11 +16,16 @@ public class RawDataEntry {
     public RawDataEntry(String inputLine) {
         String[] tokens = inputLine.replaceAll(",", ".").split(" ");
         if (tokens.length == 5) {
-            this.sensorType = tokens[0].equals("a") ? Sensor.TYPE_ACCELEROMETER : Sensor.TYPE_GYROSCOPE;
-            this.date = new Date(Long.valueOf(tokens[1]));
-            this.x = Float.valueOf(tokens[2]);
-            this.y = Float.valueOf(tokens[3]);
-            this.z = Float.valueOf(tokens[4]);
+            try {
+                this.sensorType = tokens[0].equals("a") ? Sensor.TYPE_ACCELEROMETER : Sensor.TYPE_GYROSCOPE;
+                this.date = new Date(Long.valueOf(tokens[1]));
+                this.x = Float.valueOf(tokens[2]);
+                this.y = Float.valueOf(tokens[3]);
+                this.z = Float.valueOf(tokens[4]);
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println(inputLine);
+            }
         }
     }
 
