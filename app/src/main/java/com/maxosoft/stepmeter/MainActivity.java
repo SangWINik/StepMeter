@@ -28,17 +28,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
-import weka.classifiers.pmml.consumer.NeuralNetwork;
+import weka.classifiers.lazy.IBk;
 import weka.classifiers.trees.J48;
 import weka.core.Instances;
-import weka.core.converters.ConverterUtils;
-
-import static weka.core.converters.ConverterUtils.*;
 
 public class MainActivity extends AppCompatActivity {
     private final static String EMAIL_TO = "go1oborodko97@gmail.com";
@@ -82,12 +78,18 @@ public class MainActivity extends AppCompatActivity {
             File[] myFiles = FileUtil.getFilesFromDirectory(getFilesDir().getAbsolutePath() + "/data/Me");
             File[] otherFiles = FileUtil.getFilesFromDirectory(getFilesDir().getAbsolutePath() + "/data/Others");
             Thread classificationThread = new Thread(() -> {
+                this.runClassification(myFiles, otherFiles, new IBk(), FeatureSuit.MIN_MAX_ACC);
                 this.runClassification(myFiles, otherFiles, new NaiveBayes(), FeatureSuit.MIN_MAX_ACC);
                 this.runClassification(myFiles, otherFiles, new J48(), FeatureSuit.MIN_MAX_ACC);
+                this.runClassification(myFiles, otherFiles, new IBk(), FeatureSuit.GENERAL_CHARACTERISTICS_ACC);
                 this.runClassification(myFiles, otherFiles, new NaiveBayes(), FeatureSuit.GENERAL_CHARACTERISTICS_ACC);
                 this.runClassification(myFiles, otherFiles, new J48(), FeatureSuit.GENERAL_CHARACTERISTICS_ACC);
-                this.runClassification(myFiles, otherFiles, new NaiveBayes(), FeatureSuit.ZERO_MEAN);
-                this.runClassification(myFiles, otherFiles, new J48(), FeatureSuit.ZERO_MEAN);
+                this.runClassification(myFiles, otherFiles, new IBk(), FeatureSuit.ZERO_MEAN_ACC);
+                this.runClassification(myFiles, otherFiles, new NaiveBayes(), FeatureSuit.ZERO_MEAN_ACC);
+                this.runClassification(myFiles, otherFiles, new J48(), FeatureSuit.ZERO_MEAN_ACC);
+                this.runClassification(myFiles, otherFiles, new IBk(), FeatureSuit.ALL_ACC);
+                this.runClassification(myFiles, otherFiles, new NaiveBayes(), FeatureSuit.ALL_ACC);
+                this.runClassification(myFiles, otherFiles, new J48(), FeatureSuit.ALL_ACC);
             });
             classificationThread.start();
         });
@@ -187,9 +189,11 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             Instances data = ClassificationHelper.getSourceData(dataFile);
+            long time = System.currentTimeMillis();
             Evaluation evaluation = ClassificationHelper.getClassificationResults(classifier, data);
             System.out.println(classifier.getClass().toString() + "evaluation");
             System.out.println("Feature Suit: " + featureSuit.name());
+            System.out.println("Processing Time: " + (System.currentTimeMillis() - time));
             System.out.println(evaluation.toSummaryString());
         } catch (Exception e) {
             e.printStackTrace();

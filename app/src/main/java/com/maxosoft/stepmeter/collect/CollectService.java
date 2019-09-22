@@ -66,8 +66,8 @@ public class CollectService extends Service implements SensorEventListener {
         PendingIntent pendingIntent = PendingIntent.getActivity(this,
                 0, notificationIntent, 0);
         notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("Warning")
-                .setContentText("Initiating spy protocol")
+                .setContentTitle("StepMeter")
+                .setContentText("We are collecting your data right now")
                 .setSmallIcon(R.drawable.ic_android)
                 .setContentIntent(pendingIntent)
                 .build();
