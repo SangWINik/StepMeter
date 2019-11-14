@@ -1,5 +1,6 @@
 package com.maxosoft.stepmeter.data;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,8 @@ public class Window {
     private boolean isOwner;
     private FeatureSuit featureSuit;
     private Map<String, Float> features;
+    private Date dateStart;
+    private Date dateEnd;
 
     public Window(List<RawDataEntry> allEntries, boolean isOwner, FeatureSuit featureSuit) {
         this.featureSuit = featureSuit;
@@ -61,5 +64,21 @@ public class Window {
 
     public void setFeatures(Map<String, Float> features) {
         this.features = features;
+    }
+
+    public Date getDateStart() {
+        return dateStart;
+    }
+
+    public void setDateStart(Date dateStart) {
+        this.dateStart = dateStart;
+    }
+
+    public Date getDateEnd() {
+        return dateEnd;
+    }
+
+    public void setDateEnd(Date dateEnd) {
+        this.dateEnd = dateEnd;
     }
 }

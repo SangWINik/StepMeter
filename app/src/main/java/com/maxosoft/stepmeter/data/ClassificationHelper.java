@@ -41,9 +41,9 @@ public class ClassificationHelper {
         return allWindows;
     }
 
-    private static List<Window> getWindowsFromFile(File file, boolean isOwner, FeatureSuit featureSuit) {
+    public static List<Window> getWindowsFromFile(File file, boolean isOwner, FeatureSuit featureSuit) {
         List<Window> windows = new ArrayList<>();
-        BufferedReader reader;
+        BufferedReader reader = null;
         try {
             reader = new BufferedReader(new FileReader(file));
 
@@ -69,6 +69,8 @@ public class ClassificationHelper {
                 // deleting complete window
                 if (rawEntry.getDate().getTime() - currentWindows.get(0).get(0).getDate().getTime() > Window.WINDOW_SIZE * 1000) {
                     Window complete = new Window(currentWindows.get(0), isOwner, featureSuit);
+                    complete.setDateStart(currentWindows.get(0).get(0).getDate());
+                    complete.setDateEnd(currentWindows.get(0).get(currentWindows.get(0).size() - 1).getDate());
                     windows.add(complete);
                     currentWindows.remove(0);
                 }
@@ -77,6 +79,12 @@ public class ClassificationHelper {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (Exception ignore) {}
+            }
         }
         return windows;
     }

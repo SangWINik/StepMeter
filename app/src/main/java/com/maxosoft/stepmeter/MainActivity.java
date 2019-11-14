@@ -8,16 +8,21 @@ import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Bundle;
 
+import com.maxosoft.stepmeter.api.DataApiService;
 import com.maxosoft.stepmeter.collect.CollectService;
 import com.maxosoft.stepmeter.data.ClassificationHelper;
 import com.maxosoft.stepmeter.data.FeatureSuit;
 import com.maxosoft.stepmeter.data.Window;
+import com.maxosoft.stepmeter.dto.DataWindowDto;
+import com.maxosoft.stepmeter.dto.RecordingSessionDto;
+import com.maxosoft.stepmeter.services.DataWindowService;
 import com.maxosoft.stepmeter.util.FileUtil;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.os.StrictMode;
+import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
@@ -27,6 +32,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import weka.classifiers.Classifier;
@@ -39,6 +45,9 @@ import weka.core.Instances;
 public class MainActivity extends AppCompatActivity {
     private final static String EMAIL_TO = "go1oborodko97@gmail.com";
     private final static String SUBJECT = "Collected Data";
+
+    private DataApiService dataApiService = new DataApiService(this);
+    private DataWindowService dataWindowService = new DataWindowService(this);
 
     private SensorManager sensorManager;
     private Sensor accelerometer;
@@ -92,6 +101,31 @@ public class MainActivity extends AppCompatActivity {
                 this.runClassification(myFiles, otherFiles, new J48(), FeatureSuit.ALL_ACC);
             });
             classificationThread.start();
+        });
+
+        final Button uploadBtn = findViewById(R.id.buttonUpload);
+        uploadBtn.setOnClickListener(view -> {
+            this.dataApiService.getDataWindowsForAccount(2L);
+            /*File[] files = FileUtil.getFilesFromDirectory(getFilesDir().getAbsolutePath() + "/data/upload");
+            List<RecordingSessionDto> recordingSessions = new ArrayList<>();
+            for (File file: files) {
+                List<Window> windows = ClassificationHelper.getWindowsFromFile(file, true, FeatureSuit.ALL);
+                if (windows.isEmpty()) {
+                    continue;
+                }
+                RecordingSessionDto recordingSessionDto = new RecordingSessionDto();
+                recordingSessionDto.setAccountId(2L);
+                recordingSessionDto.setDeviceId(Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID));
+                recordingSessionDto.setDateStart(windows.get(0).getDateStart());
+                recordingSessionDto.setDateEnd(windows.get(windows.size() - 1).getDateEnd());
+                recordingSessionDto.setDataWindows(new ArrayList<>());
+                for (Window window: windows) {
+                    recordingSessionDto.getDataWindows().add(new DataWindowDto(window, null));
+                }
+                recordingSessions.add(recordingSessionDto);
+            }
+
+            this.dataApiService.saveRecordingSessions(recordingSessions);*/
         });
     }
 

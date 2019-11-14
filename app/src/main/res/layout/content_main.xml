@@ -31,5 +31,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Classify" />
+        <Button
+            android:id="@+id/buttonUpload"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Upload" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
