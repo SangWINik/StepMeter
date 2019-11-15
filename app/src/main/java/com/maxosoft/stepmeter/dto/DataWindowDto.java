@@ -1,7 +1,10 @@
 package com.maxosoft.stepmeter.dto;
 
 import com.maxosoft.stepmeter.data.FeatureProvider;
+import com.maxosoft.stepmeter.data.FeatureSuit;
 import com.maxosoft.stepmeter.data.Window;
+
+import java.lang.reflect.Field;
 
 public class DataWindowDto {
     private Long id;
@@ -111,6 +114,78 @@ public class DataWindowDto {
         this.gyrZeroX = window.getFeatures().get(FeatureProvider.Feature.ZERO_X_GYR.name());
         this.gyrZeroY = window.getFeatures().get(FeatureProvider.Feature.ZERO_Y_GYR.name());
         this.gyrZeroZ = window.getFeatures().get(FeatureProvider.Feature.ZERO_Z_GYR.name());
+    }
+
+    public static String getHeader(FeatureSuit featureSuit) {
+        StringBuilder line = new StringBuilder();
+        for (FeatureProvider.Feature feature: featureSuit.getFeatureList()) {
+            line.append(feature.name()).append(",");
+        }
+        line.append("isOwner").append("\n");
+        return line.toString();
+    }
+
+    public String getCommaSeparated(boolean isOwner, FeatureSuit featureSuit) {
+        StringBuilder line = new StringBuilder();
+        for (FeatureProvider.Feature feature: featureSuit.getFeatureList()) {
+            line.append(this.getFeature(feature)).append(",");
+        }
+        line.append(isOwner).append("\n");
+        return line.toString();
+    }
+
+    public static String getHeader(boolean includeGyroscope) {
+        String header = "accMinX, accMaxX, accMinY, accMaxY, accMinZ, accMaxZ, accMeanX, accMeanY, accMeanZ, " +
+                "accVarX, accVarY, accVarZ, accDevX, accDevY, accDevZ, accSkewX, accSkewY, accSkewZ," +
+                "accKurtX, accKurtY, accKurtZ, accZeroX, accZeroY, accZeroZ";
+        if (includeGyroscope) {
+            header += ", gyrMinX, gyrMaxX, gyrMinY, gyrMaxY, gyrMinZ, gyrMaxZ, gyrMeanX, gyrMeanY, gyrMeanZ, " +
+                    "gyrVarX, gyrVarY, gyrVarZ, gyrDevX, gyrDevY, gyrDevZ, gyrSkewX, gyrSkewY, gyrSkewZ," +
+                    "gyrKurtX, gyrKurtY, gyrKurtZ, gyrZeroX, gyrZeroY, gyrZeroZ";
+        }
+        return header + ", isOwner\n";
+    }
+
+    public String getCommaSeparated(boolean isOwner, boolean includeGyroscope) {
+        String values = String.format("%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s," +
+                        "%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s",
+                this.getAccMinX(), this.getAccMaxX(),
+                this.getAccMinY(), this.getAccMaxY(), this.getAccMinZ(), this.getAccMaxZ(),
+                this.getAccMeanX(), this.getAccMeanY(), this.getAccMeanZ(),
+                this.getAccVarX(), this.getAccVarY(), this.getAccVarZ(),
+                this.getAccDevX(), this.getAccDevY(), this.getAccDevZ(),
+                this.getAccSkewX(), this.getAccSkewY(), this.getAccSkewZ(),
+                this.getAccKurtX(), this.getAccKurtY(), this.getAccKurtZ(),
+                this.getAccZeroX(), this.getAccZeroY(), this.getAccZeroZ());
+        if (includeGyroscope) {
+            values += String.format(", %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s," +
+                            "%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s",
+                    this.getGyrMinX(), this.getGyrMaxX(),
+                    this.getGyrMinY(), this.getGyrMaxY(), this.getGyrMinZ(), this.getGyrMaxZ(),
+                    this.getGyrMeanX(), this.getGyrMeanY(), this.getGyrMeanZ(),
+                    this.getGyrVarX(), this.getGyrVarY(), this.getGyrVarZ(),
+                    this.getGyrDevX(), this.getGyrDevY(), this.getGyrDevZ(),
+                    this.getGyrSkewX(), this.getGyrSkewY(), this.getGyrSkewZ(),
+                    this.getGyrKurtX(), this.getGyrKurtY(), this.getGyrKurtZ(),
+                    this.getGyrZeroX(), this.getGyrZeroY(), this.getGyrZeroZ());
+        }
+
+        return values + ", " + isOwner + "\n";
+    }
+
+    public boolean includesGyroscope() {
+        return this.gyrMinX != null;
+    }
+
+    public Float getFeature(FeatureProvider.Feature feature) {
+        try {
+            String fieldName = feature.getName();
+            Field field = this.getClass().getDeclaredField(fieldName);
+            return (Float) field.get(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public Long getId() {

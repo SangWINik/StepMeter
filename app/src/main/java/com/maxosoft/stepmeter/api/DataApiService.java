@@ -5,7 +5,6 @@ import android.content.Context;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.RequestFuture;
@@ -15,6 +14,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.maxosoft.stepmeter.dto.DataWindowDto;
 import com.maxosoft.stepmeter.dto.RecordingSessionDto;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Response;
 
 import org.json.JSONObject;
 
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class DataApiService {
+    private static final String SERVICE = "http://stepmeter.best";
 
     private Context context;
 
@@ -42,31 +44,50 @@ public class DataApiService {
         thread.start();
     }
 
-    public void getDataWindowsForAccount(Long accountId) {
-        //TODO use OK HTTP or something similar here. Volley does not work with large responses
-
-/*      VolleyLog.DEBUG = true;
-        RequestFuture<String> future = RequestFuture.newFuture();
-        List<DataWindowDto> dataWindows;
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, "http://stepmeter.best/data-windows-for-account/" + accountId,
-                future,
-                error -> System.err.println(error.getMessage()));
-
-        RequestQueue queue = Volley.newRequestQueue(this.context);
-        queue.add(stringRequest);
-        queue.start();
+    public List<DataWindowDto> getDataWindowsForAccount(Long accountId) {
+        List<DataWindowDto> dataWindows = new ArrayList<>();
 
         try {
-            String response = future.get();
+            OkHttpClient client = new OkHttpClient();
+            com.squareup.okhttp.Request request = new com.squareup.okhttp.Request.Builder()
+                    .url(SERVICE + "/data-windows-for-account/" + accountId)
+                    .build();
+
+            Response response = client.newCall(request).execute();
+            if (response.isSuccessful() && response.body() != null) {
+                dataWindows = new ObjectMapper().readValue(response.body().string(), new TypeReference<List<DataWindowDto>>() {});
+            }
         } catch (Exception e) {
             e.printStackTrace();
-        }*/
+        }
+
+        return dataWindows;
+    }
+
+    public List<DataWindowDto> getDataWindowsExceptAccount(Long accountId) {
+        List<DataWindowDto> dataWindows = new ArrayList<>();
+
+        try {
+            OkHttpClient client = new OkHttpClient();
+            com.squareup.okhttp.Request request = new com.squareup.okhttp.Request.Builder()
+                    .url(SERVICE + "/data-windows-except-account/" + accountId)
+                    .build();
+
+            Response response = client.newCall(request).execute();
+            if (response.isSuccessful() && response.body() != null) {
+                dataWindows = new ObjectMapper().readValue(response.body().string(), new TypeReference<List<DataWindowDto>>() {});
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return dataWindows;
     }
 
     private void saveSessions(List<RecordingSessionDto> recordingSessions) {
         List<StringRequest> requests = new ArrayList<>();
-        for (RecordingSessionDto recordingSession: recordingSessions) {
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, "http://stepmeter.best/recording-session",
+        for (RecordingSessionDto recordingSession : recordingSessions) {
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, SERVICE + "/recording-session",
                     System.out::println,
                     error -> System.err.println(error.getMessage())) {
                 @Override

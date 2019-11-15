@@ -84,10 +84,16 @@ public class MainActivity extends AppCompatActivity {
 
         final Button readBtn = findViewById(R.id.buttonRead);
         readBtn.setOnClickListener(view -> {
-            File[] myFiles = FileUtil.getFilesFromDirectory(getFilesDir().getAbsolutePath() + "/data/Me");
-            File[] otherFiles = FileUtil.getFilesFromDirectory(getFilesDir().getAbsolutePath() + "/data/Others");
+            /*File[] myFiles = FileUtil.getFilesFromDirectory(getFilesDir().getAbsolutePath() + "/data/Me");
+            File[] otherFiles = FileUtil.getFilesFromDirectory(getFilesDir().getAbsolutePath() + "/data/Others");*/
+            Long accountId = 2L;
             Thread classificationThread = new Thread(() -> {
-                this.runClassification(myFiles, otherFiles, new IBk(), FeatureSuit.MIN_MAX_ACC);
+                List<DataWindowDto> ownerData = dataApiService.getDataWindowsForAccount(accountId);
+                List<DataWindowDto> otherData = dataApiService.getDataWindowsExceptAccount(accountId);
+                this.runClassification(new IBk(), ownerData, otherData);
+                this.runClassification(new NaiveBayes(), ownerData, otherData);
+                this.runClassification(new J48(), ownerData, otherData);
+/*                this.runClassification(myFiles, otherFiles, new IBk(), FeatureSuit.MIN_MAX_ACC);
                 this.runClassification(myFiles, otherFiles, new NaiveBayes(), FeatureSuit.MIN_MAX_ACC);
                 this.runClassification(myFiles, otherFiles, new J48(), FeatureSuit.MIN_MAX_ACC);
                 this.runClassification(myFiles, otherFiles, new IBk(), FeatureSuit.GENERAL_CHARACTERISTICS_ACC);
@@ -98,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
                 this.runClassification(myFiles, otherFiles, new J48(), FeatureSuit.ZERO_MEAN_ACC);
                 this.runClassification(myFiles, otherFiles, new IBk(), FeatureSuit.ALL_ACC);
                 this.runClassification(myFiles, otherFiles, new NaiveBayes(), FeatureSuit.ALL_ACC);
-                this.runClassification(myFiles, otherFiles, new J48(), FeatureSuit.ALL_ACC);
+                this.runClassification(myFiles, otherFiles, new J48(), FeatureSuit.ALL_ACC);*/
             });
             classificationThread.start();
         });
@@ -227,6 +233,21 @@ public class MainActivity extends AppCompatActivity {
             Evaluation evaluation = ClassificationHelper.getClassificationResults(classifier, data);
             System.out.println(classifier.getClass().toString() + "evaluation");
             System.out.println("Feature Suit: " + featureSuit.name());
+            System.out.println("Processing Time: " + (System.currentTimeMillis() - time));
+            System.out.println(evaluation.toSummaryString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void runClassification(Classifier classifier, List<DataWindowDto> ownerData, List<DataWindowDto> otherData) {
+        File dataFile = FileUtil.createCSVFile(getFilesDir().getAbsolutePath(), ownerData, otherData);
+
+        try {
+            Instances data = ClassificationHelper.getSourceData(dataFile);
+            long time = System.currentTimeMillis();
+            Evaluation evaluation = ClassificationHelper.getClassificationResults(classifier, data);
+            System.out.println(classifier.getClass().toString() + "evaluation");
             System.out.println("Processing Time: " + (System.currentTimeMillis() - time));
             System.out.println(evaluation.toSummaryString());
         } catch (Exception e) {

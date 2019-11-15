@@ -14,54 +14,59 @@ public class FeatureProvider {
     }
 
     public enum Feature {
-        MIN_X_ACC(FeatureProvider::getMinXAcc), MAX_X_ACC(FeatureProvider::getMaxXAcc),
-        MIN_Y_ACC(FeatureProvider::getMinYAcc), MAX_Y_ACC(FeatureProvider::getMaxYAcc),
-        MIN_Z_ACC(FeatureProvider::getMinZAcc), MAX_Z_ACC(FeatureProvider::getMaxZAcc),
-        MEAN_X_ACC(FeatureProvider::getMeanXAcc),
-        MEAN_Y_ACC(FeatureProvider::getMeanYAcc),
-        MEAN_Z_ACC(FeatureProvider::getMeanZAcc),
-        VAR_X_ACC(FeatureProvider::getVarXAcc),
-        VAR_Y_ACC(FeatureProvider::getVarYAcc),
-        VAR_Z_ACC(FeatureProvider::getVarZAcc),
-        DEV_X_ACC(FeatureProvider::getDevXAcc),
-        DEV_Y_ACC(FeatureProvider::getDevYAcc),
-        DEV_Z_ACC(FeatureProvider::getDevZAcc),
-        SKEW_X_ACC(FeatureProvider::getSkewXAcc),
-        SKEW_Y_ACC(FeatureProvider::getSkewYAcc),
-        SKEW_Z_ACC(FeatureProvider::getSkewZAcc),
-        KURT_X_ACC(FeatureProvider::getKurtXAcc),
-        KURT_Y_ACC(FeatureProvider::getKurtYAcc),
-        KURT_Z_ACC(FeatureProvider::getKurtZAcc),
-        ZERO_X_ACC(FeatureProvider::getZeroXAcc),
-        ZERO_Y_ACC(FeatureProvider::getZeroYAcc),
-        ZERO_Z_ACC(FeatureProvider::getZeroZAcc),
-        MIN_X_GYR(FeatureProvider::getMinXGyr), MAX_X_GYR(FeatureProvider::getMaxXGyr),
-        MIN_Y_GYR(FeatureProvider::getMinYGyr), MAX_Y_GYR(FeatureProvider::getMaxYGyr),
-        MIN_Z_GYR(FeatureProvider::getMinZGyr), MAX_Z_GYR(FeatureProvider::getMaxZGyr),
-        MEAN_X_GYR(FeatureProvider::getMeanXGyr),
-        MEAN_Y_GYR(FeatureProvider::getMeanYGyr),
-        MEAN_Z_GYR(FeatureProvider::getMeanZGyr),
-        VAR_X_GYR(FeatureProvider::getVarXGyr),
-        VAR_Y_GYR(FeatureProvider::getVarYGyr),
-        VAR_Z_GYR(FeatureProvider::getVarZGyr),
-        DEV_X_GYR(FeatureProvider::getDevXGyr),
-        DEV_Y_GYR(FeatureProvider::getDevYGyr),
-        DEV_Z_GYR(FeatureProvider::getDevZGyr),
-        SKEW_X_GYR(FeatureProvider::getSkewXGyr),
-        SKEW_Y_GYR(FeatureProvider::getSkewYGyr),
-        SKEW_Z_GYR(FeatureProvider::getSkewZGyr),
-        KURT_X_GYR(FeatureProvider::getKurtXGyr),
-        KURT_Y_GYR(FeatureProvider::getKurtYGyr),
-        KURT_Z_GYR(FeatureProvider::getKurtZGyr),
-        ZERO_X_GYR(FeatureProvider::getZeroXGyr),
-        ZERO_Y_GYR(FeatureProvider::getZeroYGyr),
-        ZERO_Z_GYR(FeatureProvider::getZeroZGyr),
-        ;
+        MIN_X_ACC("accMinX", FeatureProvider::getMinXAcc), MAX_X_ACC("accMaxX", FeatureProvider::getMaxXAcc),
+        MIN_Y_ACC("accMinY", FeatureProvider::getMinYAcc), MAX_Y_ACC("accMaxY", FeatureProvider::getMaxYAcc),
+        MIN_Z_ACC("accMinZ", FeatureProvider::getMinZAcc), MAX_Z_ACC("accMaxZ", FeatureProvider::getMaxZAcc),
+        MEAN_X_ACC("accMeanX", FeatureProvider::getMeanXAcc),
+        MEAN_Y_ACC("accMeanY", FeatureProvider::getMeanYAcc),
+        MEAN_Z_ACC("accMeanZ", FeatureProvider::getMeanZAcc),
+        VAR_X_ACC("accVarX", FeatureProvider::getVarXAcc),
+        VAR_Y_ACC("accVarY", FeatureProvider::getVarYAcc),
+        VAR_Z_ACC("accVarZ", FeatureProvider::getVarZAcc),
+        DEV_X_ACC("accDevX", FeatureProvider::getDevXAcc),
+        DEV_Y_ACC("accDevY", FeatureProvider::getDevYAcc),
+        DEV_Z_ACC("accDevZ", FeatureProvider::getDevZAcc),
+        SKEW_X_ACC("accSkewX", FeatureProvider::getSkewXAcc),
+        SKEW_Y_ACC("accSkewY", FeatureProvider::getSkewYAcc),
+        SKEW_Z_ACC("accSkewZ", FeatureProvider::getSkewZAcc),
+        KURT_X_ACC("accKurtX", FeatureProvider::getKurtXAcc),
+        KURT_Y_ACC("accKurtY", FeatureProvider::getKurtYAcc),
+        KURT_Z_ACC("accKurtZ", FeatureProvider::getKurtZAcc),
+        ZERO_X_ACC("accZeroX", FeatureProvider::getZeroXAcc),
+        ZERO_Y_ACC("accZeroY", FeatureProvider::getZeroYAcc),
+        ZERO_Z_ACC("accZeroZ", FeatureProvider::getZeroZAcc),
+        MIN_X_GYR("gyrMinX", FeatureProvider::getMinXGyr), MAX_X_GYR("gyrMaxX", FeatureProvider::getMaxXGyr),
+        MIN_Y_GYR("gyrMinY", FeatureProvider::getMinYGyr), MAX_Y_GYR("gyrMaxY", FeatureProvider::getMaxYGyr),
+        MIN_Z_GYR("gyrMinZ", FeatureProvider::getMinZGyr), MAX_Z_GYR("gyrMaxZ", FeatureProvider::getMaxZGyr),
+        MEAN_X_GYR("gyrMeanX", FeatureProvider::getMeanXGyr),
+        MEAN_Y_GYR("gyrMeanY", FeatureProvider::getMeanYGyr),
+        MEAN_Z_GYR("gyrMeanZ", FeatureProvider::getMeanZGyr),
+        VAR_X_GYR("gyrVarX", FeatureProvider::getVarXGyr),
+        VAR_Y_GYR("gyrVarY", FeatureProvider::getVarYGyr),
+        VAR_Z_GYR("gyrVarZ", FeatureProvider::getVarZGyr),
+        DEV_X_GYR("gyrDevX", FeatureProvider::getDevXGyr),
+        DEV_Y_GYR("gyrDevY", FeatureProvider::getDevYGyr),
+        DEV_Z_GYR("gyrDevZ", FeatureProvider::getDevZGyr),
+        SKEW_X_GYR("gyrSkewX", FeatureProvider::getSkewXGyr),
+        SKEW_Y_GYR("gyrSkewY", FeatureProvider::getSkewYGyr),
+        SKEW_Z_GYR("gyrSkewZ", FeatureProvider::getSkewZGyr),
+        KURT_X_GYR("gyrKurtX", FeatureProvider::getKurtXGyr),
+        KURT_Y_GYR("gyrKurtY", FeatureProvider::getKurtYGyr),
+        KURT_Z_GYR("gyrKurtZ", FeatureProvider::getKurtZGyr),
+        ZERO_X_GYR("gyrZeroX", FeatureProvider::getZeroXGyr),
+        ZERO_Y_GYR("gyrZeroY", FeatureProvider::getZeroYGyr),
+        ZERO_Z_GYR("gyrZeroZ", FeatureProvider::getZeroZGyr);
 
+        private String name;
         private FeatureMiner miner;
 
-        Feature(FeatureMiner featureMiner) {
+        Feature(String name, FeatureMiner featureMiner) {
+            this.name = name;
             this.miner = featureMiner;
+        }
+
+        public String getName() {
+            return this.name;
         }
 
         public Float getValue(List<RawDataEntry> data) {

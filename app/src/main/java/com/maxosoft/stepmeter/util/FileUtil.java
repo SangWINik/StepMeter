@@ -1,7 +1,9 @@
 package com.maxosoft.stepmeter.util;
 
+import com.maxosoft.stepmeter.data.FeatureSuit;
 import com.maxosoft.stepmeter.data.RawDataEntry;
 import com.maxosoft.stepmeter.data.Window;
+import com.maxosoft.stepmeter.dto.DataWindowDto;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -14,6 +16,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.stream.Collectors;
 
 public class FileUtil {
 
@@ -76,6 +79,35 @@ public class FileUtil {
             outputStream.write(Window.getFeatureHeader(dataWindows.get(0).getFeatureSuit()).getBytes());
             for (Window window: dataWindows) {
                 outputStream.write(window.getFeaturesLine().getBytes());
+            }
+            outputStream.close();
+            return file;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static File createCSVFile(String filesDir, List<DataWindowDto> userData, List<DataWindowDto> otherData) {
+        FileOutputStream outputStream = null;
+        try {
+            FeatureSuit featureSuit = FeatureSuit.ALL_ACC;
+            long countWithGyr = userData.stream().filter(DataWindowDto::includesGyroscope).count();
+            if ((float) countWithGyr / userData.size() >= 0.5) {
+                featureSuit = FeatureSuit.ALL;
+                userData = userData.stream().filter(DataWindowDto::includesGyroscope).collect(Collectors.toList());
+                otherData = otherData.stream().filter(DataWindowDto::includesGyroscope).collect(Collectors.toList());
+            }
+
+            new File(filesDir + "/data/All").mkdirs();
+            File file = new File(filesDir + "/data/All/data.csv");
+            outputStream = new FileOutputStream(file);
+            outputStream.write(DataWindowDto.getHeader(featureSuit).getBytes());
+            for (DataWindowDto window: userData) {
+                outputStream.write(window.getCommaSeparated(true, featureSuit).getBytes());
+            }
+            for (DataWindowDto window: otherData) {
+                outputStream.write(window.getCommaSeparated(false, featureSuit).getBytes());
             }
             outputStream.close();
             return file;
