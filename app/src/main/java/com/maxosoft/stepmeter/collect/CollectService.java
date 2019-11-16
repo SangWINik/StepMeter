@@ -13,7 +13,7 @@ import android.os.IBinder;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
-import com.maxosoft.stepmeter.MainActivity;
+import com.maxosoft.stepmeter.TestActivity;
 import com.maxosoft.stepmeter.R;
 import com.maxosoft.stepmeter.util.FileUtil;
 
@@ -62,7 +62,7 @@ public class CollectService extends Service implements SensorEventListener {
             timer.schedule(timerTask, DELAY);
         }
 
-        Intent notificationIntent = new Intent(this, MainActivity.class);
+        Intent notificationIntent = new Intent(this, TestActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this,
                 0, notificationIntent, 0);
         notification = new NotificationCompat.Builder(this, CHANNEL_ID)

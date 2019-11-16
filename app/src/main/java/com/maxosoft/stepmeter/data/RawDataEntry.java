@@ -4,7 +4,7 @@ import android.hardware.Sensor;
 
 import java.util.Date;
 
-public class RawDataEntry {
+public class RawDataEntry implements ITimestampedItem {
     private Integer sensorType;
     private Date date;
     private Float x;
@@ -67,5 +67,10 @@ public class RawDataEntry {
 
     public void setZ(Float z) {
         this.z = z;
+    }
+
+    @Override
+    public Date getTime() {
+        return this.getDate();
     }
 }

@@ -88,7 +88,7 @@ public class FileUtil {
         return null;
     }
 
-    public static File createCSVFile(String filesDir, List<DataWindowDto> userData, List<DataWindowDto> otherData) {
+    public static File createDataFile(String filesDir, List<DataWindowDto> userData, List<DataWindowDto> otherData) {
         FileOutputStream outputStream = null;
         try {
             FeatureSuit featureSuit = FeatureSuit.ALL_ACC;
