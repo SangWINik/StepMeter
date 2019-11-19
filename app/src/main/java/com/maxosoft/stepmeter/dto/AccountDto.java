@@ -1,8 +1,9 @@
 package com.maxosoft.stepmeter.dto;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class AccountDto {
+public class AccountDto implements Serializable {
     private Long id;
     private String email;
     private Date registrationDate;

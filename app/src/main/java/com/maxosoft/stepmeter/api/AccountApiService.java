@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.maxosoft.stepmeter.dto.AccountDto;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
 public class AccountApiService {
@@ -21,7 +22,10 @@ public class AccountApiService {
 
             Response response = client.newCall(request).execute();
             if (response.isSuccessful() && response.body() != null) {
-                account = new ObjectMapper().readValue(response.body().string(), AccountDto.class);
+                String body = response.body().string();
+                if (!body.isEmpty()) {
+                    account = new ObjectMapper().readValue(body, AccountDto.class);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -34,7 +38,7 @@ public class AccountApiService {
         try {
             OkHttpClient client = new OkHttpClient();
             Request request = new Request.Builder()
-                    .method("POST", null)
+                    .method("POST", RequestBody.create(null, new byte[]{}))
                     .url(SERVICE + "/accounts?email=" + email)
                     .build();
 

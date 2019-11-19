@@ -4,6 +4,7 @@ import com.maxosoft.stepmeter.data.FeatureSuit;
 import com.maxosoft.stepmeter.data.RawDataEntry;
 import com.maxosoft.stepmeter.data.Window;
 import com.maxosoft.stepmeter.dto.DataWindowDto;
+import com.maxosoft.stepmeter.factory.FeatureSuitFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -91,13 +92,15 @@ public class FileUtil {
     public static File createDataFile(String filesDir, List<DataWindowDto> userData, List<DataWindowDto> otherData) {
         FileOutputStream outputStream = null;
         try {
-            FeatureSuit featureSuit = FeatureSuit.ALL_ACC;
+            boolean includeGyroscope = false;
             long countWithGyr = userData.stream().filter(DataWindowDto::includesGyroscope).count();
             if ((float) countWithGyr / userData.size() >= 0.5) {
-                featureSuit = FeatureSuit.ALL;
+                includeGyroscope = true;
                 userData = userData.stream().filter(DataWindowDto::includesGyroscope).collect(Collectors.toList());
                 otherData = otherData.stream().filter(DataWindowDto::includesGyroscope).collect(Collectors.toList());
             }
+
+            FeatureSuit featureSuit = FeatureSuitFactory.getDefault(includeGyroscope);
 
             new File(filesDir + "/data/All").mkdirs();
             File file = new File(filesDir + "/data/All/data.csv");

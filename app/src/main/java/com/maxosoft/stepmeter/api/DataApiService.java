@@ -17,11 +17,8 @@ import com.maxosoft.stepmeter.dto.RecordingSessionDto;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Response;
 
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 public class DataApiService {
     private static final String SERVICE = "http://stepmeter.best";

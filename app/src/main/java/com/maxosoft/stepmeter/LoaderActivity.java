@@ -57,18 +57,11 @@ public class LoaderActivity extends Activity {
                     switch (msg.what) {
                         case INIT_COMPETE_CODE:
                         AccountDto account = (AccountDto) msg.obj;
-                            Classifier classifier;
-                        try {
-                            classifier = classificationModelService.getModel();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            classifier = classificationModelService.saveOrUpdateModelForAccount(account.getId());
-                        }
                         Intent i = new Intent(context, MainActivity.class);
-                        i.setFlags(i.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY); // Adds the FLAG_ACTIVITY_NO_HISTORY flag
+                        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        i.putExtra("account", account);
                         startActivity(i);
                     }
-
                 }
             };
 
