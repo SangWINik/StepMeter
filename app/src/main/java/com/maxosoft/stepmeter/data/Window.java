@@ -27,7 +27,7 @@ public class Window {
     public static String getFeatureHeader(FeatureSuit featureSuit) {
         StringBuilder line = new StringBuilder();
         for (FeatureProvider.Feature feature: featureSuit.getFeatureList()) {
-            line.append(feature.name()).append(",");
+            line.append(feature.getName()).append(",");
         }
         line.append("res").append("\n");
         return line.toString();

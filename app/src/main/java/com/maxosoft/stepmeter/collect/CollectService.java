@@ -183,6 +183,7 @@ public class CollectService extends Service implements SensorEventListener {
         if (!windows.isEmpty()) {
             RecordingSessionDto recordingSession = new RecordingSessionDto();
             recordingSession.setId(2L);
+            recordingSession.setAccountId(accountId);
             recordingSession.setDeviceId(Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID));
             recordingSession.setDateStart(windows.get(0).getDateStart());
             recordingSession.setDateEnd(windows.get(windows.size() - 1).getDateEnd());

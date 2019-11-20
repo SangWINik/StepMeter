@@ -12,11 +12,13 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.core.Instances;
 import weka.core.SerializationHelper;
+import weka.filters.unsupervised.attribute.NumericToNominal;
 
 public class ClassificationModelService {
     private static final String MODEL_FILE_NAME = "/currentModel.model";
@@ -34,7 +36,11 @@ public class ClassificationModelService {
     }
 
     public Classifier getModel() throws Exception {
-        return (Classifier) SerializationHelper.read(modelPath + MODEL_FILE_NAME);
+        if (new File(modelPath + MODEL_FILE_NAME).exists()) {
+            return (Classifier) SerializationHelper.read(modelPath + MODEL_FILE_NAME);
+        } else {
+            return null;
+        }
     }
 
     public Classifier saveOrUpdateModelForAccount(Long accountId) {
@@ -46,6 +52,11 @@ public class ClassificationModelService {
 
             Instances data = ClassificationHelper.getSourceData(tmpDataFile);
             classifier.buildClassifier(data);
+
+            Evaluation evaluation = new Evaluation(data);
+            evaluation.crossValidateModel(classifier, data, 10, new Random());
+            System.out.println(classifier.getClass().toString() + "evaluation");
+            System.out.println(evaluation.toSummaryString());
 
             this.saveModel(classifier);
             tmpDataFile.delete();

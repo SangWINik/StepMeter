@@ -120,6 +120,33 @@ public class FileUtil {
         return null;
     }
 
+    public static File createUnlabeledDataFile(String filesDir, List<DataWindowDto> userData) {
+        FileOutputStream outputStream = null;
+        try {
+            boolean includeGyroscope = false;
+            long countWithGyr = userData.stream().filter(DataWindowDto::includesGyroscope).count();
+            if ((float) countWithGyr / userData.size() >= 0.5) {
+                includeGyroscope = true;
+                userData = userData.stream().filter(DataWindowDto::includesGyroscope).collect(Collectors.toList());
+            }
+
+            FeatureSuit featureSuit = FeatureSuitFactory.getDefault(includeGyroscope);
+
+            new File(filesDir + "/data/unlabeled").mkdirs();
+            File file = new File(filesDir + "/data/unlabeled/data.csv");
+            outputStream = new FileOutputStream(file);
+            outputStream.write(DataWindowDto.getHeader(featureSuit).getBytes());
+            for (DataWindowDto window: userData) {
+                outputStream.write(window.getCommaSeparated(true, featureSuit).getBytes());
+            }
+            outputStream.close();
+            return file;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     private static String generateFileName() {
         return new Date() + ".txt";
     }

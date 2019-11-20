@@ -119,18 +119,22 @@ public class DataWindowDto {
     public static String getHeader(FeatureSuit featureSuit) {
         StringBuilder line = new StringBuilder();
         for (FeatureProvider.Feature feature: featureSuit.getFeatureList()) {
-            line.append(feature.name()).append(",");
+            line.append(feature.getName()).append(",");
         }
         line.append("isOwner").append("\n");
         return line.toString();
     }
 
-    public String getCommaSeparated(boolean isOwner, FeatureSuit featureSuit) {
+    public String getCommaSeparated(Boolean isOwner, FeatureSuit featureSuit) {
         StringBuilder line = new StringBuilder();
         for (FeatureProvider.Feature feature: featureSuit.getFeatureList()) {
             line.append(this.getFeature(feature)).append(",");
         }
-        line.append(isOwner).append("\n");
+        String classLabel = "";
+        if (isOwner != null) {
+            classLabel = isOwner ? "1" : "0";
+        }
+        line.append(classLabel).append("\n");
         return line.toString();
     }
 

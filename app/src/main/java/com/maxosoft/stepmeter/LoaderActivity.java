@@ -17,12 +17,20 @@ import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.AccountPicker;
 import com.maxosoft.stepmeter.api.AccountApiService;
 import com.maxosoft.stepmeter.api.DataApiService;
+import com.maxosoft.stepmeter.data.ClassificationHelper;
 import com.maxosoft.stepmeter.dto.AccountDto;
+import com.maxosoft.stepmeter.dto.DataWindowDto;
 import com.maxosoft.stepmeter.services.ClassificationModelService;
+import com.maxosoft.stepmeter.util.FileUtil;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Random;
 
 import weka.classifiers.Classifier;
+import weka.core.Instances;
 
 public class LoaderActivity extends Activity {
     private static final long MODEL_UPDATE_INTERVAL = 1000 * 60 * 60 * 24 * 3; // 3 days
@@ -76,6 +84,28 @@ public class LoaderActivity extends Activity {
                 if (lastModelUpdate == null || new Date().getTime() - lastModelUpdate.getTime() > MODEL_UPDATE_INTERVAL) {
                     classificationModelService.saveOrUpdateModelForAccount(account.getId());
                 }
+
+                //todo delete
+                try {
+                    DataApiService dataApiService = new DataApiService(context);
+                    List<DataWindowDto> ownerWindows = dataApiService.getDataWindowsForAccount(account.getId());
+                    List<DataWindowDto> others = dataApiService.getDataWindowsExceptAccount(account.getId());
+                    Random random = new Random();
+                    List<DataWindowDto> randomWindows = new ArrayList<>();
+                    for (int i = 0; i < 5; i++) {
+                        randomWindows.add(ownerWindows.get(random.nextInt(ownerWindows.size())));
+                        randomWindows.add(others.get(random.nextInt(others.size())));
+                    }
+//                    File file = FileUtil.createUnlabeledDataFile(getFilesDir().getAbsolutePath(), randomWindows);
+                    Classifier classifier = classificationModelService.getModel();
+//                    Instances labeled = ClassificationHelper.classify(classifier, file);
+                    randomWindows.forEach(rw -> ClassificationHelper.classifyWindow(classifier, rw));
+//                    double result = ClassificationHelper.classifyWindow(classificationModelService.getModel(), randomWindow);
+                    double rr = 2 + 2;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
                 Message message = handler.obtainMessage(INIT_COMPETE_CODE, account);
                 message.sendToTarget();
             };
