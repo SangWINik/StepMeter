@@ -6,13 +6,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 
 import com.maxosoft.stepmeter.collect.CollectService;
+import com.maxosoft.stepmeter.collect.IdentificationService;
 import com.maxosoft.stepmeter.dto.AccountDto;
 
 public class MainActivity extends Activity {
 
     private Button collectButton;
+    private Switch realTimeIdSwitch;
 
     private AccountDto account = null;
 
@@ -22,6 +26,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         collectButton = findViewById(R.id.collectButton);
+        realTimeIdSwitch = findViewById(R.id.realTimeIdSwitch);
 
         if (getIntent().getExtras() != null) {
             account = (AccountDto) getIntent().getExtras().getSerializable("account");
@@ -30,6 +35,8 @@ public class MainActivity extends Activity {
         if (this.isMyServiceRunning(CollectService.class)) {
             collectButton.setText("Stop Collecting");
         }
+
+        realTimeIdSwitch.setChecked(this.isMyServiceRunning(IdentificationService.class));
 
         this.initEvents();
     }
@@ -44,6 +51,17 @@ public class MainActivity extends Activity {
                 stopCollecting();
             }
         });
+
+        realTimeIdSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b) {
+                    startIdentifying();
+                } else {
+                    stopIdentifying();
+                }
+            }
+        });
     }
 
     private void startCollecting() {
@@ -55,6 +73,19 @@ public class MainActivity extends Activity {
 
     private void stopCollecting() {
         Intent intent = new Intent(this, CollectService.class);
+        intent.putExtra("stop", true);
+        startService(intent);
+    }
+
+    private void startIdentifying() {
+        Intent intent = new Intent(this, IdentificationService.class);
+        intent.putExtra("welcomeMessage", "Custom Welcome Message");
+        intent.putExtra("accountId", account.getId());
+        startService(intent);
+    }
+
+    private void stopIdentifying() {
+        Intent intent = new Intent(this, IdentificationService.class);
         intent.putExtra("stop", true);
         startService(intent);
     }

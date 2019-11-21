@@ -1,5 +1,7 @@
 package com.maxosoft.stepmeter.data;
 
+import android.hardware.Sensor;
+
 import com.maxosoft.stepmeter.dto.DataWindowDto;
 import com.maxosoft.stepmeter.factory.FeatureSuitFactory;
 
@@ -105,8 +107,44 @@ public class ClassificationHelper {
         return windows;
     }
 
-    public static double classifyWindow(Classifier classifier, DataWindowDto windowDto) {
-        double result = -1;
+    public static List<DataWindowDto> getWindowsFromRawEntries(List<RawDataEntry> entries) {
+        if (entries == null || entries.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        boolean includeGyroscope = entries.stream().anyMatch(e -> e.getSensorType() == Sensor.TYPE_GYROSCOPE);
+
+        List<DataWindowDto> windows = new ArrayList<>();
+        List<List<RawDataEntry>> currentWindows = new ArrayList<>();
+        currentWindows.add(new ArrayList<>());
+
+        long currentWindowStart = entries.get(0).getDate().getTime();
+        for (RawDataEntry rawEntry : entries) {
+
+            // adding next window
+            if (rawEntry.getDate().getTime() - currentWindowStart > Window.WINDOW_OFFSET * 1000) {
+                currentWindows.add(new ArrayList<>());
+                currentWindowStart = rawEntry.getDate().getTime();
+            }
+
+            for (List<RawDataEntry> cw : currentWindows) {
+                cw.add(rawEntry);
+            }
+
+            // deleting complete window
+            if (rawEntry.getDate().getTime() - currentWindows.get(0).get(0).getDate().getTime() > Window.WINDOW_SIZE * 1000) {
+                Window complete = new Window(currentWindows.get(0), true, FeatureSuitFactory.getDefault(includeGyroscope));
+                DataWindowDto dataWindowDto = new DataWindowDto(complete, null);
+                complete.setDateStart(currentWindows.get(0).get(0).getDate());
+                complete.setDateEnd(currentWindows.get(0).get(currentWindows.get(0).size() - 1).getDate());
+                windows.add(dataWindowDto);
+                currentWindows.remove(0);
+            }
+        }
+        return windows;
+    }
+
+    public static boolean classifyWindow(Classifier classifier, DataWindowDto windowDto) {
         try {
             FeatureSuit featureSuit = FeatureSuitFactory.getDefault(true);
             ArrayList<Attribute> attributeList = new ArrayList<>();
@@ -123,23 +161,20 @@ public class ClassificationHelper {
             classVal.add("0");
             attributeList.add(new Attribute("isOwner",classVal));
 
-            // Declare Instances which is required since I want to use classification/Prediction
-            Instances dataset = new Instances("whatever", attributeList, 0);
+            Instances dataset = new Instances("unlabeledData", attributeList, 0);
             Instance inst_co = new DenseInstance(dataset.numAttributes());
             for (FeatureProvider.Feature feature: featureSuit.getFeatureList()) {
                 inst_co.setValue(map.get(feature), windowDto.getFeature(feature));
             }
             dataset.add(inst_co);
             dataset.setClassIndex(dataset.numAttributes()-1);
-
-            //Will print 0 if it's a "yes", and 1 if it's a "no"
-            System.out.println(classifier.classifyInstance(dataset.instance(0)));
-            //Here I call dataset.instance(0) since there is only one instance added in the dataset, if you do add another one you can use dataset.instance(0), etc.
+            double index = classifier.classifyInstance(dataset.instance(0));
+            String stringRes = dataset.classAttribute().value((int) index);
+            return stringRes.equals("1");
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
+            return false;
         }
-        return result;
     }
 
     public static Instances classify(Classifier classifier, File file) {

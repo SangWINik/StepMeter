@@ -86,7 +86,7 @@ public class LoaderActivity extends Activity {
                 }
 
                 //todo delete
-                try {
+                /*try {
                     DataApiService dataApiService = new DataApiService(context);
                     List<DataWindowDto> ownerWindows = dataApiService.getDataWindowsForAccount(account.getId());
                     List<DataWindowDto> others = dataApiService.getDataWindowsExceptAccount(account.getId());
@@ -104,7 +104,7 @@ public class LoaderActivity extends Activity {
                     double rr = 2 + 2;
                 } catch (Exception e) {
                     e.printStackTrace();
-                }
+                }*/
 
                 Message message = handler.obtainMessage(INIT_COMPETE_CODE, account);
                 message.sendToTarget();

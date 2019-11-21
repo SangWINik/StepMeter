@@ -16,7 +16,6 @@ import com.maxosoft.stepmeter.data.ClassificationHelper;
 import com.maxosoft.stepmeter.data.FeatureSuit;
 import com.maxosoft.stepmeter.data.Window;
 import com.maxosoft.stepmeter.dto.DataWindowDto;
-import com.maxosoft.stepmeter.services.DataWindowService;
 import com.maxosoft.stepmeter.util.FileUtil;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -50,7 +49,6 @@ public class TestActivity extends AppCompatActivity {
     private final static String SUBJECT = "Collected Data";
 
     private DataApiService dataApiService = new DataApiService(this);
-    private DataWindowService dataWindowService = new DataWindowService(this);
     //private ClassificationModelService classificationModelService = new ClassificationModelService(getFilesDir().getAbsolutePath() + "/model");
 
     private SensorManager sensorManager;

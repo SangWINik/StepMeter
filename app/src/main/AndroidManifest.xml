@@ -36,6 +36,9 @@
         <service
             android:name=".collect.CollectService"
             android:exported="false" />
+        <service
+            android:name=".collect.IdentificationService"
+            android:exported="false" />
 
         <activity
             android:name=".TestActivity"

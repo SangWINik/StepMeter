@@ -35,12 +35,15 @@ public class ClassificationModelService {
         this.dataApiService = new DataApiService(this.context);
     }
 
-    public Classifier getModel() throws Exception {
-        if (new File(modelPath + MODEL_FILE_NAME).exists()) {
-            return (Classifier) SerializationHelper.read(modelPath + MODEL_FILE_NAME);
-        } else {
-            return null;
+    public Classifier getModel() {
+        try {
+            if (new File(modelPath + MODEL_FILE_NAME).exists()) {
+                return (Classifier) SerializationHelper.read(modelPath + MODEL_FILE_NAME);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        return null;
     }
 
     public Classifier saveOrUpdateModelForAccount(Long accountId) {
