@@ -191,12 +191,14 @@ public class IdentificationService extends Service implements SensorEventListene
 
         long successCount = results.stream().filter(r -> r).count();
 
+        String infoMessage = String.format("Success: %s, all: %s.", successCount, results.size());
+
         String title = "Who are you?";
-        String message = "I don't know you";
+        String message = "I don't know you" + ". " + infoMessage;
 
         if (((float)successCount / results.size()) * 100 > SUCCESS_RATE) {
             title = "Hello!";
-            message = welcomeMessage;
+            message = welcomeMessage + ". " + infoMessage;
         }
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
