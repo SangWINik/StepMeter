@@ -50,6 +50,9 @@ public class ClassificationModelService {
         try {
             List<DataWindowDto> ownerData = dataApiService.getDataWindowsForAccount(accountId);
             List<DataWindowDto> otherData = dataApiService.getDataWindowsExceptAccount(accountId);
+            if (ownerData.isEmpty() || otherData.isEmpty()) {
+                return null;
+            }
             Classifier classifier = ClassifierFactory.getClassifier();
             File tmpDataFile = FileUtil.createDataFile(this.context.getFilesDir().getAbsolutePath(), ownerData, otherData);
 

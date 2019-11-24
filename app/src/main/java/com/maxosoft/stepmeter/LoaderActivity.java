@@ -68,6 +68,7 @@ public class LoaderActivity extends Activity {
                         Intent i = new Intent(context, MainActivity.class);
                         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         i.putExtra("account", account);
+                        i.putExtra("accountEmail", accountName);
                         startActivity(i);
                     }
                 }
@@ -84,27 +85,6 @@ public class LoaderActivity extends Activity {
                 if (lastModelUpdate == null || new Date().getTime() - lastModelUpdate.getTime() > MODEL_UPDATE_INTERVAL) {
                     classificationModelService.saveOrUpdateModelForAccount(account.getId());
                 }
-
-                //todo delete
-                /*try {
-                    DataApiService dataApiService = new DataApiService(context);
-                    List<DataWindowDto> ownerWindows = dataApiService.getDataWindowsForAccount(account.getId());
-                    List<DataWindowDto> others = dataApiService.getDataWindowsExceptAccount(account.getId());
-                    Random random = new Random();
-                    List<DataWindowDto> randomWindows = new ArrayList<>();
-                    for (int i = 0; i < 5; i++) {
-                        randomWindows.add(ownerWindows.get(random.nextInt(ownerWindows.size())));
-                        randomWindows.add(others.get(random.nextInt(others.size())));
-                    }
-//                    File file = FileUtil.createUnlabeledDataFile(getFilesDir().getAbsolutePath(), randomWindows);
-                    Classifier classifier = classificationModelService.getModel();
-//                    Instances labeled = ClassificationHelper.classify(classifier, file);
-                    randomWindows.forEach(rw -> ClassificationHelper.classifyWindow(classifier, rw));
-//                    double result = ClassificationHelper.classifyWindow(classificationModelService.getModel(), randomWindow);
-                    double rr = 2 + 2;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }*/
 
                 Message message = handler.obtainMessage(INIT_COMPETE_CODE, account);
                 message.sendToTarget();

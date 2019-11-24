@@ -9,7 +9,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="16dp">
 
         <Button
             android:layout_width="match_parent"
@@ -18,12 +19,53 @@
             android:paddingRight="40dp"
             android:theme="@android:style/Theme.Material.Light"
             android:id="@+id/collectButton"
+            android:textAllCaps="false"
+            android:textSize="18dp"
+            android:textColor="@color/colorPrimary"
             android:text="Collect Data"/>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:paddingLeft="40dp"
+            android:paddingRight="40dp"
+            android:theme="@android:style/Theme.Material.Light"
+            android:id="@+id/identificationButton"
+            android:textAllCaps="false"
+            android:textSize="18dp"
+            android:textColor="@color/colorPrimary"
+            android:text="Identification Test"/>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:paddingLeft="40dp"
+            android:paddingRight="40dp"
+            android:theme="@android:style/Theme.Material.Light"
+            android:id="@+id/refreshModelButton"
+            android:textAllCaps="false"
+            android:textSize="18dp"
+            android:textColor="@color/colorPrimary"
+            android:visibility="gone"
+            android:text="Refresh Model"/>
 
         <Switch
-            android:id="@+id/realTimeIdSwitch"
+            android:id="@+id/badDataSwitch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Real Time ID" />
+            android:paddingTop="10dp"
+            android:textSize="24dp"
+            android:textColor="@color/colorPrimary"
+            android:visibility="gone"
+            android:text="Record Neutral Data" />
+
+        <Switch
+            android:id="@+id/autoUpdatesSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:textSize="24dp"
+            android:textColor="@color/colorPrimary"
+            android:text="Allow Auto-Updates" />
+
+        <include layout="@layout/content_result"/>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

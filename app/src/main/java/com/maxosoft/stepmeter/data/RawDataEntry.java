@@ -73,4 +73,15 @@ public class RawDataEntry implements ITimestampedItem {
     public Date getTime() {
         return this.getDate();
     }
+
+    @Override
+    public String toString() {
+        return "RawDataEntry{" +
+                "sensorType=" + sensorType +
+                ", date=" + date +
+                ", x=" + x +
+                ", y=" + y +
+                ", z=" + z +
+                '}';
+    }
 }

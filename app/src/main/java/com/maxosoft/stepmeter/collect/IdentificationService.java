@@ -1,5 +1,7 @@
 package com.maxosoft.stepmeter.collect;
 
+import android.app.Activity;
+import android.app.KeyguardManager;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -11,8 +13,11 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.net.Uri;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.provider.Settings;
+import android.view.WindowManager;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
@@ -47,7 +52,7 @@ import static com.maxosoft.stepmeter.App.CHANNEL_ID;
 
 public class IdentificationService extends Service implements SensorEventListener {
     private final static Integer SUCCESS_RATE = 70; // in %
-    private final static Integer DELAY = 1*3*1000; // 3 second delay
+    private final static Integer DELAY = 1*0*1000; // 3 second delay
     private final static Long LENGTH_MILLIS = 1*30*1000L; // 30 second length
 
     private DataApiService dataApiService = new DataApiService(this);
@@ -60,6 +65,9 @@ public class IdentificationService extends Service implements SensorEventListene
     private Long accountId = null;
     private Classifier classifier = null;
     private String welcomeMessage = "Default welcome";
+
+    private Integer changeCount = 0;
+    private String filesDir;
 
     @Override
     public int onStartCommand(final Intent intent, int flags, int startId) {
@@ -84,6 +92,8 @@ public class IdentificationService extends Service implements SensorEventListene
                 }
             };
             timer.schedule(timerTask, DELAY);
+
+            filesDir = intent.getStringExtra("dir");
         }
 
         Intent notificationIntent = new Intent(this, MainActivity.class);
@@ -95,6 +105,7 @@ public class IdentificationService extends Service implements SensorEventListene
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentIntent(pendingIntent)
                 .build();
+
         startForeground(1, notification);
         return START_NOT_STICKY;
     }
@@ -113,6 +124,8 @@ public class IdentificationService extends Service implements SensorEventListene
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
+        changeCount++;
+
         RawDataEntry rawDataEntry = new RawDataEntry();
         rawDataEntry.setSensorType(sensorEvent.sensor.getType());
         rawDataEntry.setDate(new Date());
@@ -175,6 +188,8 @@ public class IdentificationService extends Service implements SensorEventListene
                 } else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
                     System.out.println("screen is on");
                     onScreenOn(context);
+                    changeCount = 0;
+                    data.clear();
                 }
             }
         };
@@ -183,6 +198,20 @@ public class IdentificationService extends Service implements SensorEventListene
 
     private void onScreenOn(Context context) {
         sensorManager.unregisterListener(this);
+
+        try {
+            File logFile = new File(filesDir + "log.txt");
+            if (!logFile.exists()) {
+                logFile.createNewFile();
+            }
+            FileOutputStream os = new FileOutputStream(logFile);
+            for (RawDataEntry d: data) {
+                os.write((d.toString() + "\n").getBytes());
+            }
+            os.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         List<DataWindowDto> windows = ClassificationHelper.getWindowsFromRawEntries(data);
         startSensors();
 
@@ -191,20 +220,23 @@ public class IdentificationService extends Service implements SensorEventListene
 
         long successCount = results.stream().filter(r -> r).count();
 
-        String infoMessage = String.format("Success: %s, all: %s.", successCount, results.size());
+        String infoMessage = String.format("Success: %s, all: %s, changeCount: %s, entries: %s, first: %s, last: %s",
+                successCount, results.size(), changeCount, data.size(), data.get(0).getDate(), data.get(data.size() - 1).getDate());
 
         String title = "Who are you?";
-        String message = "I don't know you" + ". " + infoMessage;
+        String message = "I don't know you";
 
-        if (((float)successCount / results.size()) * 100 > SUCCESS_RATE) {
+        if (((float)successCount / results.size()) * 100 > SUCCESS_RATE && windows.size() > 10) {
             title = "Hello!";
-            message = welcomeMessage + ". " + infoMessage;
+            message = welcomeMessage;
         }
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_android)
                 .setContentTitle(title)
                 .setContentText(message)
+                .setStyle(new NotificationCompat.BigTextStyle()
+                        .bigText(infoMessage))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
 

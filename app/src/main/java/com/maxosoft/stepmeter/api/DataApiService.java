@@ -6,8 +6,6 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -29,12 +27,12 @@ public class DataApiService {
         this.context = context;
     }
 
-    public void saveRecordingSessions(List<RecordingSessionDto> recordingSessions) {
+    public void saveRecordingSessions(List<RecordingSessionDto> recordingSessions, String email) {
         VolleyLog.DEBUG = true;
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                saveSessions(recordingSessions);
+                saveSessions(recordingSessions, email);
             }
         });
 
@@ -81,10 +79,14 @@ public class DataApiService {
         return dataWindows;
     }
 
-    private void saveSessions(List<RecordingSessionDto> recordingSessions) {
+    private void saveSessions(List<RecordingSessionDto> recordingSessions, String email) {
         List<StringRequest> requests = new ArrayList<>();
         for (RecordingSessionDto recordingSession : recordingSessions) {
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, SERVICE + "/recording-session",
+            String url = SERVICE + "/recording-session";
+            if (email != null && !email.isEmpty()) {
+                url += "?email=" + email;
+            }
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                     System.out::println,
                     error -> System.err.println(error.getMessage())) {
                 @Override

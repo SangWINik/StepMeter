@@ -191,7 +191,7 @@ public class CollectService extends Service implements SensorEventListener {
             for (Window window: windows) {
                 recordingSession.getDataWindows().add(new DataWindowDto(window, null));
             }
-            dataApiService.saveRecordingSessions(Collections.singletonList(recordingSession));
+            dataApiService.saveRecordingSessions(Collections.singletonList(recordingSession), null);
         }
     }
 }
