@@ -79,6 +79,8 @@ public class MainActivity extends Activity {
 
         classificationModelService = new ClassificationModelService(this);
 
+//        refreshModelButton.setVisibility(View.VISIBLE);
+
         if (getIntent().getExtras() != null) {
             account = (AccountDto) getIntent().getExtras().getSerializable("account");
             if (account != null && account.getIsAdmin() != null && account.getIsAdmin()) {

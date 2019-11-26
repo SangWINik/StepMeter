@@ -6,6 +6,7 @@ import com.maxosoft.stepmeter.api.DataApiService;
 import com.maxosoft.stepmeter.data.ClassificationHelper;
 import com.maxosoft.stepmeter.dto.DataWindowDto;
 import com.maxosoft.stepmeter.factory.ClassifierFactory;
+import com.maxosoft.stepmeter.factory.FeatureSuitFactory;
 import com.maxosoft.stepmeter.util.FileUtil;
 
 import java.io.File;
@@ -57,10 +58,15 @@ public class ClassificationModelService {
             File tmpDataFile = FileUtil.createDataFile(this.context.getFilesDir().getAbsolutePath(), ownerData, otherData);
 
             Instances data = ClassificationHelper.getSourceData(tmpDataFile);
-            classifier.buildClassifier(data);
 
+            long time = System.currentTimeMillis();
+            classifier.buildClassifier(data);
             Evaluation evaluation = new Evaluation(data);
             evaluation.crossValidateModel(classifier, data, 10, new Random());
+            System.out.println(classifier.getClass().toString() + "evaluation");
+            System.out.println("Feature Suit: " + FeatureSuitFactory.getDefault(true).name());
+            System.out.println("Processing Time: " + (System.currentTimeMillis() - time));
+            System.out.println(evaluation.toSummaryString());
             System.out.println(classifier.getClass().toString() + "evaluation");
             System.out.println(evaluation.toSummaryString());
 

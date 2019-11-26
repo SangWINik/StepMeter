@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.provider.Settings;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -18,13 +19,17 @@ import com.google.android.gms.common.AccountPicker;
 import com.maxosoft.stepmeter.api.AccountApiService;
 import com.maxosoft.stepmeter.api.DataApiService;
 import com.maxosoft.stepmeter.data.ClassificationHelper;
+import com.maxosoft.stepmeter.data.FeatureSuit;
+import com.maxosoft.stepmeter.data.Window;
 import com.maxosoft.stepmeter.dto.AccountDto;
 import com.maxosoft.stepmeter.dto.DataWindowDto;
+import com.maxosoft.stepmeter.dto.RecordingSessionDto;
 import com.maxosoft.stepmeter.services.ClassificationModelService;
 import com.maxosoft.stepmeter.util.FileUtil;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -55,6 +60,7 @@ public class LoaderActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE_EMAIL && resultCode == RESULT_OK) {
             String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+//            String accountName = "29nadia95@gmail.com";
             Toast.makeText(this, accountName,
                     Toast.LENGTH_LONG).show();
 
